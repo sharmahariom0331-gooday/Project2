@@ -22,7 +22,27 @@ import {
   Tag,
   Truck,
   CreditCard,
-  Zap
+  Zap,
+  Grid,
+  RotateCcw,
+  Gift,
+  MessageSquare,
+  FileText,
+  Megaphone,
+  Volume2,
+  HelpCircle,
+  Send,
+  Smartphone,
+  Lock,
+  Clock,
+  AlertCircle,
+  Award,
+  TrendingDown,
+  Wallet,
+  ChevronDown,
+  CheckCircle,
+  AlertTriangle,
+  Star
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -106,6 +126,108 @@ interface DeliveryOption {
   enabled: boolean;
 }
 
+interface Influencer {
+  id: number;
+  name: string;
+  email: string;
+  followers: number;
+  commission: number;
+  status: 'active' | 'inactive';
+  joinDate: string;
+}
+
+interface Membership {
+  id: number;
+  name: string;
+  price: string;
+  benefits: string[];
+  activeMembers: number;
+  status: 'active' | 'inactive';
+}
+
+interface SupportTicket {
+  id: number;
+  ticketId: string;
+  customer: string;
+  subject: string;
+  status: 'open' | 'in-progress' | 'resolved';
+  priority: 'low' | 'medium' | 'high';
+  createdDate: string;
+}
+
+interface Announcement {
+  id: number;
+  title: string;
+  content: string;
+  publishDate: string;
+  status: 'draft' | 'published';
+}
+
+interface Page {
+  id: number;
+  title: string;
+  slug: string;
+  status: 'draft' | 'published';
+  lastModified: string;
+}
+
+interface Banner {
+  id: number;
+  title: string;
+  image: string;
+  link: string;
+  active: boolean;
+  position: string;
+}
+
+interface Refund {
+  id: number;
+  orderId: number;
+  customerName: string;
+  amount: string;
+  reason: string;
+  status: 'requested' | 'approved' | 'rejected' | 'completed';
+  requestDate: string;
+}
+
+interface Transaction {
+  id: number;
+  transactionId: string;
+  customer: string;
+  amount: string;
+  type: 'credit' | 'debit';
+  date: string;
+  status: 'success' | 'pending' | 'failed';
+}
+
+interface PayoutRequest {
+  id: number;
+  influencerId: number;
+  influencerName: string;
+  amount: string;
+  status: 'pending' | 'approved' | 'rejected' | 'paid';
+  requestDate: string;
+}
+
+interface Review {
+  id: number;
+  productId: number;
+  customerName: string;
+  rating: number;
+  comment: string;
+  date: string;
+  verified: boolean;
+}
+
+interface Inventory {
+  id: number;
+  productId: number;
+  productName: string;
+  quantity: number;
+  reorderLevel: number;
+  lastRestocked: string;
+}
+
 interface AdminPanelV2Props {
   products: Product[];
   setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
@@ -123,6 +245,28 @@ interface AdminPanelV2Props {
   setPaymentMethods: React.Dispatch<React.SetStateAction<PaymentMethod[]>>;
   deliveryOptions: DeliveryOption[];
   setDeliveryOptions: React.Dispatch<React.SetStateAction<DeliveryOption[]>>;
+  influencers: Influencer[];
+  setInfluencers: React.Dispatch<React.SetStateAction<Influencer[]>>;
+  memberships: Membership[];
+  setMemberships: React.Dispatch<React.SetStateAction<Membership[]>>;
+  tickets: SupportTicket[];
+  setTickets: React.Dispatch<React.SetStateAction<SupportTicket[]>>;
+  announcements: Announcement[];
+  setAnnouncements: React.Dispatch<React.SetStateAction<Announcement[]>>;
+  pages: Page[];
+  setPages: React.Dispatch<React.SetStateAction<Page[]>>;
+  banners: Banner[];
+  setBanners: React.Dispatch<React.SetStateAction<Banner[]>>;
+  refunds: Refund[];
+  setRefunds: React.Dispatch<React.SetStateAction<Refund[]>>;
+  transactions: Transaction[];
+  setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
+  payoutRequests: PayoutRequest[];
+  setPayoutRequests: React.Dispatch<React.SetStateAction<PayoutRequest[]>>;
+  reviews: Review[];
+  setReviews: React.Dispatch<React.SetStateAction<Review[]>>;
+  inventory: Inventory[];
+  setInventory: React.Dispatch<React.SetStateAction<Inventory[]>>;
   adminEmail: string;
   onLogout: () => void;
 }
