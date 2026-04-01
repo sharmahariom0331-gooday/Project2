@@ -217,7 +217,7 @@ const ProductListing: React.FC<{ category: string; products: Product[]; onBack: 
   );
 };
 
-const ProductDetail: React.FC<{ product: Product; products: Product[]; onBack: () => void; onProductClick: (product: Product) => void; onBuyNow: (product: Product) => void }> = ({ product, products, onBack, onProductClick, onBuyNow }) => {
+const ProductDetail: React.FC<{ product: Product; products: Product[]; onBack: () => void; onProductClick: (product: Product) => void; onBuyNow: (product: Product) => void; onAddToCart: () => void; onWishlist: (productId: number) => void; isWishlisted: boolean }> = ({ product, products, onBack, onProductClick, onBuyNow, onAddToCart, onWishlist, isWishlisted }) => {
   const [selectedImg, setSelectedImg] = useState(product.img);
   const thumbnails = [product.img, product.img, product.img, product.img];
 
@@ -259,8 +259,8 @@ const ProductDetail: React.FC<{ product: Product; products: Product[]; onBack: (
                 src={selectedImg}
                 alt={product.name}
               />
-              <div className="wishlist-float">
-                <Heart size={20} />
+              <div className="wishlist-float" onClick={() => onWishlist(product.id)} style={{ cursor: 'pointer' }}>
+                <Heart size={20} fill={isWishlisted ? "currentColor" : "none"} color={isWishlisted ? "#ff4757" : "currentColor"} className={wishlisted === product.id ? 'blinking-heart' : ''} />
               </div>
             </div>
           </div>
@@ -334,9 +334,9 @@ const ProductDetail: React.FC<{ product: Product; products: Product[]; onBack: (
             </div>
 
             <div className="cta-row">
-              <button className="btn-outline-maroon"><ShoppingBag size={18} /> ADD TO BAG</button>
+              <button className="btn-outline-maroon" onClick={onAddToCart}><ShoppingBag size={18} /> ADD TO BAG</button>
               <button className="btn-fill-maroon" onClick={() => onBuyNow(product)}>BUY NOW</button>
-              <div className="wishlist-btn-circle"><Heart size={20} /></div>
+              <div className="wishlist-btn-circle" onClick={() => onWishlist(product.id)} style={{ cursor: 'pointer' }}><Heart size={20} fill={isWishlisted ? "currentColor" : "none"} color={isWishlisted ? "#ff4757" : "currentColor"} className={wishlisted === product.id ? 'blinking-heart' : ''} /></div>
             </div>
           </div>
         </div>
@@ -406,6 +406,10 @@ const App: React.FC = () => {
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
   const [navVisible, setNavVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [cartCount, setCartCount] = useState(0);
+  const [wishlistItems, setWishlistItems] = useState<Set<number>>(new Set());
+  const [cartBlinking, setCartBlinking] = useState(false);
+  const [wishlisted, setWishlisted] = useState<number | null>(null);
 
   // Scroll to top when view changes
   useEffect(() => {
@@ -455,6 +459,24 @@ const App: React.FC = () => {
     setView('listing');
   };
 
+  const handleAddToCart = () => {
+    setCartCount(cartCount + 1);
+    setCartBlinking(true);
+    setTimeout(() => setCartBlinking(false), 600);
+  };
+
+  const handleWishlistToggle = (productId: number) => {
+    const newWishlist = new Set(wishlistItems);
+    if (newWishlist.has(productId)) {
+      newWishlist.delete(productId);
+    } else {
+      newWishlist.add(productId);
+    }
+    setWishlistItems(newWishlist);
+    setWishlisted(productId);
+    setTimeout(() => setWishlisted(null), 600);
+  };
+
   return (
     <div className="akshima-app">
       {/* Header */}
@@ -478,11 +500,13 @@ const App: React.FC = () => {
                 <polyline points="9 22 9 12 15 12 15 22"/>
               </svg>
             </button>
-            <button className="icon-btn" title="Wishlist"><Heart size={20} /></button>
+            <button className="icon-btn" title="Wishlist" onClick={() => selectedProduct && handleWishlistToggle(selectedProduct.id)}>
+              <Heart size={20} fill={selectedProduct && wishlistItems.has(selectedProduct.id) ? "currentColor" : "none"} color={selectedProduct && wishlistItems.has(selectedProduct.id) ? "#ff4757" : "currentColor"} />
+            </button>
             <button className="icon-btn" title="Account" onClick={() => setView('dashboard')}><User size={20} /></button>
             <button className="icon-btn cart-icon" title="Cart">
               <ShoppingBag size={20} />
-              <span className="cart-count">0</span>
+              <span className={`cart-count ${cartBlinking ? 'blinking' : ''}`}>{cartCount}</span>
             </button>
           </div>
         </div>
@@ -866,7 +890,7 @@ const App: React.FC = () => {
           <ProductListing category={selectedCategory} products={products} onBack={handleBackToHome} onProductClick={handleProductClick} />
         )}
         {view === 'detail' && selectedProduct && (
-          <ProductDetail key={selectedProduct.id} product={selectedProduct} products={products} onBack={handleBackToListing} onProductClick={handleProductClick} onBuyNow={handleBuyNow} />
+          <ProductDetail key={selectedProduct.id} product={selectedProduct} products={products} onBack={handleBackToListing} onProductClick={handleProductClick} onBuyNow={handleBuyNow} onAddToCart={handleAddToCart} onWishlist={handleWishlistToggle} isWishlisted={wishlistItems.has(selectedProduct.id)} />
         )}
         {view === 'checkout' && selectedProduct && (
           <CheckoutPage product={selectedProduct} onBack={() => setView('detail')} onContinueShopping={handleBackToHome} />
