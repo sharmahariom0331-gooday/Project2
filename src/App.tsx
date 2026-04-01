@@ -465,6 +465,42 @@ const App: React.FC = () => {
         </div>
       </header>
 
+      {/* Category Navigation */}
+      <nav className="category-nav">
+        <div className="category-nav-container">
+          <button className="category-nav-item active" onClick={() => handleCategoryClick('All Jewellery')}>
+            <Gem size={16} /> All Jewellery
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('Gold')}>
+            <Gem size={16} /> Gold
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('Diamond')}>
+            <Gem size={16} /> Diamond
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('Earrings')}>
+            <Gem size={16} /> Earrings
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('Rings')}>
+            <Gem size={16} /> Rings
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('Daily Wear')}>
+            <Gem size={16} /> Daily Wear
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('Gemstone')}>
+            <Gem size={16} /> Gemstone
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('Wedding')}>
+            <Gem size={16} /> Wedding
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('Gifting')}>
+            <Gem size={16} /> Gifting
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('More')}>
+            <Gem size={16} /> More <ChevronDown size={14} style={{ marginLeft: '4px' }} />
+          </button>
+        </div>
+      </nav>
+
       <AnimatePresence mode="wait">
         {view === 'home' && (
           <motion.div

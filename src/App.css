@@ -137,6 +137,72 @@
   text-align: center;
 }
 
+/* Category Navigation */
+.category-nav {
+  background: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
+  position: sticky;
+  top: 80px;
+  z-index: 999;
+}
+
+.category-nav-container {
+  display: flex;
+  gap: 0;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 50px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.category-nav-container::-webkit-scrollbar {
+  display: none;
+}
+
+.category-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+}
+
+.category-nav-item:hover {
+  color: #C5A059;
+}
+
+.category-nav-item.active {
+  color: #C5A059;
+  border-bottom-color: #C5A059;
+}
+
+.category-nav-item svg {
+  color: #C5A059;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .category-nav-container {
+    padding: 0 20px;
+  }
+
+  .category-nav-item {
+    padding: 12px 15px;
+    font-size: 12px;
+  }
+}
+
 /* Hero Section */
 .hero-slider {
   background: var(--primary-maroon);
