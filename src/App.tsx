@@ -287,7 +287,7 @@ const ProductDetail: React.FC<{ product: Product; products: Product[]; onBack: (
                 alt={product.name}
               />
               <div className="wishlist-float" onClick={() => onWishlist(product.id)} style={{ cursor: 'pointer' }}>
-                <Heart size={20} fill={isWishlisted ? "currentColor" : "none"} color={isWishlisted ? "#ff4757" : "currentColor"} className={wishlisted === product.id ? 'blinking-heart' : ''} />
+                <Heart size={20} fill={isWishlisted ? "currentColor" : "none"} color={isWishlisted ? "#ff4757" : "currentColor"} />
               </div>
             </div>
           </div>
@@ -363,7 +363,7 @@ const ProductDetail: React.FC<{ product: Product; products: Product[]; onBack: (
             <div className="cta-row">
               <button className="btn-outline-maroon" onClick={onAddToCart}><ShoppingBag size={18} /> ADD TO BAG</button>
               <button className="btn-fill-maroon" onClick={() => onBuyNow(product)}>BUY NOW</button>
-              <div className="wishlist-btn-circle" onClick={() => onWishlist(product.id)} style={{ cursor: 'pointer' }}><Heart size={20} fill={isWishlisted ? "currentColor" : "none"} color={isWishlisted ? "#ff4757" : "currentColor"} className={wishlisted === product.id ? 'blinking-heart' : ''} /></div>
+              <div className="wishlist-btn-circle" onClick={() => onWishlist(product.id)} style={{ cursor: 'pointer' }}><Heart size={20} fill={isWishlisted ? "currentColor" : "none"} color={isWishlisted ? "#ff4757" : "currentColor"} /></div>
             </div>
           </div>
         </div>
