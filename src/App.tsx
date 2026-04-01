@@ -434,6 +434,33 @@ const App: React.FC = () => {
 
   return (
     <div className="akshima-app">
+      {/* Header */}
+      <header className="header">
+        <div className="header-container">
+          <div className="logo-section">
+            <a href="#" className="logo-link" onClick={(e) => { e.preventDefault(); handleBackToHome(); }}>
+              <span className="header-logo-text">{settings.siteName}</span>
+            </a>
+          </div>
+
+          <div className="search-bar">
+            <Search size={18} />
+            <input type="text" placeholder="Search for gold necklace" />
+          </div>
+
+          <div className="header-icons">
+            <button className="icon-btn" title="Camera"><Camera size={20} /></button>
+            <button className="icon-btn" title="Mic"><Mic size={20} /></button>
+            <button className="icon-btn" title="Wishlist"><Heart size={20} /></button>
+            <button className="icon-btn" title="Account"><User size={20} /></button>
+            <button className="icon-btn cart-icon" title="Cart">
+              <ShoppingBag size={20} />
+              <span className="cart-count">0</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
       <AnimatePresence mode="wait">
         {view === 'home' && (
           <motion.div
