@@ -452,6 +452,39 @@ const App: React.FC = () => {
     { id: 1003, userId: 1, userName: 'Raj Kumar', productName: 'Ornate Rhythm Gold Haram', price: '₹ 850,000', quantity: 2, date: '2024-03-15', status: 'completed' }
   ]);
 
+  // Handle URL-based routing
+  useEffect(() => {
+    const path = window.location.pathname.toLowerCase();
+    if (path === '/admin') {
+      setView('admin');
+    } else if (path === '/dashboard') {
+      setView('dashboard');
+    } else {
+      setView('home');
+    }
+
+    // Keyboard shortcut: Ctrl+Shift+A to access admin panel
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+        setView('admin');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
+
+  // Update URL when view changes
+  useEffect(() => {
+    if (view === 'admin') {
+      window.history.pushState({}, '', '/Admin');
+    } else if (view === 'dashboard') {
+      window.history.pushState({}, '', '/Dashboard');
+    } else {
+      window.history.pushState({}, '', '/');
+    }
+  }, [view]);
+
   // Scroll to top when view changes
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -1067,7 +1100,30 @@ const App: React.FC = () => {
           </div>
           <p className="copyright">&copy; 2026 Akshima Jewellers India Private Limited. All Rights Reserved</p>
           <div className="admin-link">
-            <span onClick={() => setView('admin')} style={{cursor: 'pointer', opacity: 0.6}}><Gem size={14} /></span>
+            <button
+              onClick={() => setView('admin')}
+              title="Admin Panel (Email: admin@akshima.com | Password: admin@123)"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px 8px',
+                opacity: 0.6,
+                fontSize: '11px',
+                color: '#666',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '1';
+                e.currentTarget.style.color = '#C5A059';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '0.6';
+                e.currentTarget.style.color = '#666';
+              }}
+            >
+              <Gem size={14} style={{display: 'inline-block', marginRight: '4px'}} /> ADMIN
+            </button>
           </div>
         </div>
       </footer>
