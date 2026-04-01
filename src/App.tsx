@@ -3,6 +3,7 @@ import { Search, Camera, Mic, Gem, Home, Heart, User, ShoppingBag, Truck, Rotate
 import { motion, AnimatePresence } from 'framer-motion';
 import AdminPanel from './admin/AdminPanel';
 import CheckoutPage from './CheckoutPage';
+import Dashboard from './dashboard/Dashboard';
 import './App.css';
 
 // Sample Product Data
@@ -398,7 +399,7 @@ const ProductDetail: React.FC<{ product: Product; products: Product[]; onBack: (
 };
 
 const App: React.FC = () => {
-  const [view, setView] = useState<'home' | 'listing' | 'detail' | 'admin' | 'checkout'>('home');
+  const [view, setView] = useState<'home' | 'listing' | 'detail' | 'admin' | 'checkout' | 'dashboard'>('home');
   const [selectedCategory, setSelectedCategory] = useState<string>('Rivaah');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
@@ -478,7 +479,7 @@ const App: React.FC = () => {
               </svg>
             </button>
             <button className="icon-btn" title="Wishlist"><Heart size={20} /></button>
-            <button className="icon-btn" title="Account"><User size={20} /></button>
+            <button className="icon-btn" title="Account" onClick={() => setView('dashboard')}><User size={20} /></button>
             <button className="icon-btn cart-icon" title="Cart">
               <ShoppingBag size={20} />
               <span className="cart-count">0</span>
@@ -871,13 +872,16 @@ const App: React.FC = () => {
           <CheckoutPage product={selectedProduct} onBack={() => setView('detail')} onContinueShopping={handleBackToHome} />
         )}
         {view === 'admin' && (
-          <AdminPanel 
-            products={products} 
-            setProducts={setProducts} 
-            settings={settings} 
-            setSettings={setSettings} 
-            onClose={() => setView('home')} 
+          <AdminPanel
+            products={products}
+            setProducts={setProducts}
+            settings={settings}
+            setSettings={setSettings}
+            onClose={() => setView('home')}
           />
+        )}
+        {view === 'dashboard' && (
+          <Dashboard onLogout={() => setView('home')} />
         )}
       </AnimatePresence>
 
