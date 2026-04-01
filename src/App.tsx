@@ -458,6 +458,8 @@ const ProductDetail: React.FC<{ product: Product; products: Product[]; onBack: (
 const App: React.FC = () => {
   const [view, setView] = useState<'home' | 'listing' | 'detail' | 'admin' | 'checkout' | 'dashboard'>('home');
   const [selectedCategory, setSelectedCategory] = useState<string>('Rivaah');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
+  const [expandedCategoryId, setExpandedCategoryId] = useState<number | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
@@ -730,26 +732,58 @@ const App: React.FC = () => {
                 <h2 className="section-title">Find Your Perfect Match</h2>
                 <p className="section-subtitle">Shop by Categories</p>
               </div>
-              <div className="categories-grid">
-                {[
-                  { name: 'EARRINGS', img: 'https://images.unsplash.com/photo-1635767798638-3e25273a8236?q=80&w=200' },
-                  { name: 'FINGER RINGS', img: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=80&w=200' },
-                  { name: 'PENDANTS', img: 'https://images.unsplash.com/photo-1599643477877-537ef527848b?q=80&w=200' },
-                  { name: 'MANGALSUTRA', img: 'https://images.unsplash.com/photo-1598560912005-5976593c6831?q=80&w=200' },
-                  { name: 'BRACELETS', img: 'https://images.unsplash.com/photo-1611085583191-a3b13b244821?q=80&w=200' },
-                  { name: 'BANGLES', img: 'https://images.unsplash.com/photo-1611085583191-a3b13b244821?q=80&w=200' },
-                  { name: 'CHAINS', img: 'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?q=80&w=200' },
-                ].map((cat, i) => (
-                  <div className="category-card" key={i} onClick={() => handleCategoryClick(cat.name)} style={{ cursor: 'pointer' }}>
-                    <div className="category-img"><img src={cat.img} alt={cat.name} /></div>
-                    <span>{cat.name}</span>
+
+              {expandedCategoryId === null ? (
+                <div className="categories-grid">
+                  {categories.map((cat) => (
+                    <div
+                      key={cat.id}
+                      className="category-card"
+                      onClick={() => setExpandedCategoryId(cat.id)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className="category-img">
+                        <img src={`https://images.unsplash.com/photo-${cat.id === 1 ? '1611085583191-a3b13b244821' : cat.id === 2 ? '1599643477877-537ef527848b' : cat.id === 3 ? '1598560912005-5976593c6831' : '1635767798638-3e25273a8236'}?q=80&w=200`} alt={cat.name} />
+                      </div>
+                      <span>{cat.name}</span>
+                      <small className="subcategory-count">{cat.subcategories.length} subcategories</small>
+                    </div>
+                  ))}
+                  <div className="category-card view-all" onClick={() => handleCategoryClick('All Categories')} style={{ cursor: 'pointer' }}>
+                    <div className="category-img"><span className="count">{categories.length}</span><small>CATEGORIES</small></div>
+                    <span>VIEW ALL</span>
                   </div>
-                ))}
-                <div className="category-card view-all" onClick={() => handleCategoryClick('All Categories')} style={{ cursor: 'pointer' }}>
-                  <div className="category-img"><span className="count">10+</span><small>CATEGORIES</small></div>
-                  <span>VIEW ALL</span>
                 </div>
-              </div>
+              ) : (
+                <div className="subcategory-view">
+                  <button className="btn-back-categories" onClick={() => setExpandedCategoryId(null)}>
+                    ← Back to Categories
+                  </button>
+                  <h3 className="subcategory-title">
+                    {categories.find(c => c.id === expandedCategoryId)?.name} Jewellery
+                  </h3>
+                  <div className="subcategories-grid">
+                    {categories.find(c => c.id === expandedCategoryId)?.subcategories.map((subcat, idx) => (
+                      <div
+                        key={idx}
+                        className="subcategory-card"
+                        onClick={() => {
+                          setSelectedCategory(categories.find(c => c.id === expandedCategoryId)?.name || '');
+                          setSelectedSubcategory(subcat);
+                          setExpandedCategoryId(null);
+                          setView('listing');
+                        }}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <div className="subcategory-icon">
+                          <Gem size={32} color="#C5A059" />
+                        </div>
+                        <span className="subcategory-name">{subcat}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </section>
 
             {/* Shop By Gender */}
