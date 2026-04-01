@@ -2,9 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Search, Camera, Mic, Gem, Home, Heart, User, ShoppingBag, Truck, RotateCcw, ShieldCheck, Wrench, Calendar, Mail, Phone, MoveRight, Filter, ChevronDown, Star, ChevronRight, Share2, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AdminPanel from './admin/AdminPanel';
+import AdminLogin from './admin/AdminLogin';
+import AdminPanelV2 from './admin/AdminPanelV2';
 import CheckoutPage from './CheckoutPage';
 import Dashboard from './dashboard/Dashboard';
 import './App.css';
+import './styles/admin-login.css';
+import './styles/admin-panel-v2.css';
 
 // Sample Product Data
 const INITIAL_PRODUCTS: Product[] = [
@@ -127,6 +131,29 @@ interface Product {
   stone?: string;
 }
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  joinDate: string;
+  cartItems: number;
+  wishlistItems: number;
+  totalOrders: number;
+  totalSpent: string;
+}
+
+interface Order {
+  id: number;
+  userId: number;
+  userName: string;
+  productName: string;
+  price: string;
+  quantity: number;
+  date: string;
+  status: 'pending' | 'processing' | 'completed' | 'cancelled';
+}
+
 const ProductListing: React.FC<{ category: string; products: Product[]; onBack: () => void; onProductClick: (product: Product) => void }> = ({ category, products, onBack, onProductClick }) => {
   return (
     <motion.div
@@ -217,7 +244,7 @@ const ProductListing: React.FC<{ category: string; products: Product[]; onBack: 
   );
 };
 
-const ProductDetail: React.FC<{ product: Product; products: Product[]; onBack: () => void; onProductClick: (product: Product) => void; onBuyNow: (product: Product) => void }> = ({ product, products, onBack, onProductClick, onBuyNow }) => {
+const ProductDetail: React.FC<{ product: Product; products: Product[]; onBack: () => void; onProductClick: (product: Product) => void; onBuyNow: (product: Product) => void; onAddToCart: () => void; onWishlist: (productId: number) => void; isWishlisted: boolean }> = ({ product, products, onBack, onProductClick, onBuyNow, onAddToCart, onWishlist, isWishlisted }) => {
   const [selectedImg, setSelectedImg] = useState(product.img);
   const thumbnails = [product.img, product.img, product.img, product.img];
 
@@ -259,8 +286,8 @@ const ProductDetail: React.FC<{ product: Product; products: Product[]; onBack: (
                 src={selectedImg}
                 alt={product.name}
               />
-              <div className="wishlist-float">
-                <Heart size={20} />
+              <div className="wishlist-float" onClick={() => onWishlist(product.id)} style={{ cursor: 'pointer' }}>
+                <Heart size={20} fill={isWishlisted ? "currentColor" : "none"} color={isWishlisted ? "#ff4757" : "currentColor"} className={wishlisted === product.id ? 'blinking-heart' : ''} />
               </div>
             </div>
           </div>
@@ -334,9 +361,9 @@ const ProductDetail: React.FC<{ product: Product; products: Product[]; onBack: (
             </div>
 
             <div className="cta-row">
-              <button className="btn-outline-maroon"><ShoppingBag size={18} /> ADD TO BAG</button>
+              <button className="btn-outline-maroon" onClick={onAddToCart}><ShoppingBag size={18} /> ADD TO BAG</button>
               <button className="btn-fill-maroon" onClick={() => onBuyNow(product)}>BUY NOW</button>
-              <div className="wishlist-btn-circle"><Heart size={20} /></div>
+              <div className="wishlist-btn-circle" onClick={() => onWishlist(product.id)} style={{ cursor: 'pointer' }}><Heart size={20} fill={isWishlisted ? "currentColor" : "none"} color={isWishlisted ? "#ff4757" : "currentColor"} className={wishlisted === product.id ? 'blinking-heart' : ''} /></div>
             </div>
           </div>
         </div>
@@ -406,6 +433,57 @@ const App: React.FC = () => {
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
   const [navVisible, setNavVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [cartCount, setCartCount] = useState(0);
+  const [wishlistItems, setWishlistItems] = useState<Set<number>>(new Set());
+  const [cartBlinking, setCartBlinking] = useState(false);
+  const [wishlisted, setWishlisted] = useState<number | null>(null);
+
+  // Admin state
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [adminEmail, setAdminEmail] = useState('');
+  const [users, setUsers] = useState<User[]>([
+    { id: 1, name: 'Raj Kumar', email: 'raj@example.com', phone: '9876543210', joinDate: '2024-01-15', cartItems: 2, wishlistItems: 3, totalOrders: 5, totalSpent: '₹ 2,50,000' },
+    { id: 2, name: 'Priya Singh', email: 'priya@example.com', phone: '9876543211', joinDate: '2024-02-10', cartItems: 1, wishlistItems: 2, totalOrders: 3, totalSpent: '₹ 1,80,000' },
+    { id: 3, name: 'Ankit Sharma', email: 'ankit@example.com', phone: '9876543212', joinDate: '2024-03-05', cartItems: 0, wishlistItems: 1, totalOrders: 2, totalSpent: '₹ 95,000' }
+  ]);
+  const [orders, setOrders] = useState<Order[]>([
+    { id: 1001, userId: 1, userName: 'Raj Kumar', productName: 'Exquisite Gold Gheroo Haram', price: '₹ 706,345', quantity: 1, date: '2024-03-20', status: 'completed' },
+    { id: 1002, userId: 2, userName: 'Priya Singh', productName: 'Spectacular Leaf Pattern Gold Haram', price: '₹ 1,496,571', quantity: 1, date: '2024-03-18', status: 'processing' },
+    { id: 1003, userId: 1, userName: 'Raj Kumar', productName: 'Ornate Rhythm Gold Haram', price: '₹ 850,000', quantity: 2, date: '2024-03-15', status: 'completed' }
+  ]);
+
+  // Handle URL-based routing
+  useEffect(() => {
+    const path = window.location.pathname.toLowerCase();
+    if (path === '/admin') {
+      setView('admin');
+    } else if (path === '/dashboard') {
+      setView('dashboard');
+    } else {
+      setView('home');
+    }
+
+    // Keyboard shortcut: Ctrl+Shift+A to access admin panel
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+        setView('admin');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
+
+  // Update URL when view changes
+  useEffect(() => {
+    if (view === 'admin') {
+      window.history.pushState({}, '', '/Admin');
+    } else if (view === 'dashboard') {
+      window.history.pushState({}, '', '/Dashboard');
+    } else {
+      window.history.pushState({}, '', '/');
+    }
+  }, [view]);
 
   // Scroll to top when view changes
   useEffect(() => {
@@ -455,6 +533,51 @@ const App: React.FC = () => {
     setView('listing');
   };
 
+  const handleAddToCart = () => {
+    setCartCount(cartCount + 1);
+    setCartBlinking(true);
+    setTimeout(() => setCartBlinking(false), 600);
+
+    // Track order in admin panel
+    if (selectedProduct) {
+      const newOrder: Order = {
+        id: Math.max(...orders.map(o => o.id), 1000) + 1,
+        userId: 1,
+        userName: 'Current User',
+        productName: selectedProduct.name,
+        price: selectedProduct.price,
+        quantity: 1,
+        date: new Date().toISOString().split('T')[0],
+        status: 'pending'
+      };
+      setOrders([...orders, newOrder]);
+    }
+  };
+
+  const handleWishlistToggle = (productId: number) => {
+    const newWishlist = new Set(wishlistItems);
+    if (newWishlist.has(productId)) {
+      newWishlist.delete(productId);
+    } else {
+      newWishlist.add(productId);
+    }
+    setWishlistItems(newWishlist);
+    setWishlisted(productId);
+    setTimeout(() => setWishlisted(null), 600);
+  };
+
+  const handleAdminLogin = (adminData: { email: string; name: string }) => {
+    setIsAdminLoggedIn(true);
+    setAdminEmail(adminData.email);
+    setView('admin');
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdminLoggedIn(false);
+    setAdminEmail('');
+    setView('home');
+  };
+
   return (
     <div className="akshima-app">
       {/* Header */}
@@ -478,11 +601,13 @@ const App: React.FC = () => {
                 <polyline points="9 22 9 12 15 12 15 22"/>
               </svg>
             </button>
-            <button className="icon-btn" title="Wishlist"><Heart size={20} /></button>
+            <button className="icon-btn" title="Wishlist" onClick={() => selectedProduct && handleWishlistToggle(selectedProduct.id)}>
+              <Heart size={20} fill={selectedProduct && wishlistItems.has(selectedProduct.id) ? "currentColor" : "none"} color={selectedProduct && wishlistItems.has(selectedProduct.id) ? "#ff4757" : "currentColor"} />
+            </button>
             <button className="icon-btn" title="Account" onClick={() => setView('dashboard')}><User size={20} /></button>
             <button className="icon-btn cart-icon" title="Cart">
               <ShoppingBag size={20} />
-              <span className="cart-count">0</span>
+              <span className={`cart-count ${cartBlinking ? 'blinking' : ''}`}>{cartCount}</span>
             </button>
           </div>
         </div>
@@ -866,19 +991,28 @@ const App: React.FC = () => {
           <ProductListing category={selectedCategory} products={products} onBack={handleBackToHome} onProductClick={handleProductClick} />
         )}
         {view === 'detail' && selectedProduct && (
-          <ProductDetail key={selectedProduct.id} product={selectedProduct} products={products} onBack={handleBackToListing} onProductClick={handleProductClick} onBuyNow={handleBuyNow} />
+          <ProductDetail key={selectedProduct.id} product={selectedProduct} products={products} onBack={handleBackToListing} onProductClick={handleProductClick} onBuyNow={handleBuyNow} onAddToCart={handleAddToCart} onWishlist={handleWishlistToggle} isWishlisted={wishlistItems.has(selectedProduct.id)} />
         )}
         {view === 'checkout' && selectedProduct && (
           <CheckoutPage product={selectedProduct} onBack={() => setView('detail')} onContinueShopping={handleBackToHome} />
         )}
         {view === 'admin' && (
-          <AdminPanel
-            products={products}
-            setProducts={setProducts}
-            settings={settings}
-            setSettings={setSettings}
-            onClose={() => setView('home')}
-          />
+          isAdminLoggedIn ? (
+            <AdminPanelV2
+              products={products}
+              setProducts={setProducts}
+              settings={settings}
+              setSettings={setSettings}
+              users={users}
+              setUsers={setUsers}
+              orders={orders}
+              setOrders={setOrders}
+              adminEmail={adminEmail}
+              onLogout={handleAdminLogout}
+            />
+          ) : (
+            <AdminLogin onLoginSuccess={handleAdminLogin} />
+          )
         )}
         {view === 'dashboard' && (
           <Dashboard onLogout={() => setView('home')} />
@@ -966,7 +1100,30 @@ const App: React.FC = () => {
           </div>
           <p className="copyright">&copy; 2026 Akshima Jewellers India Private Limited. All Rights Reserved</p>
           <div className="admin-link">
-            <span onClick={() => setView('admin')} style={{cursor: 'pointer', opacity: 0.6}}><Gem size={14} /></span>
+            <button
+              onClick={() => setView('admin')}
+              title="Admin Panel (Email: admin@akshima.com | Password: admin@123)"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px 8px',
+                opacity: 0.6,
+                fontSize: '11px',
+                color: '#666',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '1';
+                e.currentTarget.style.color = '#C5A059';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '0.6';
+                e.currentTarget.style.color = '#666';
+              }}
+            >
+              <Gem size={14} style={{display: 'inline-block', marginRight: '4px'}} /> ADMIN
+            </button>
           </div>
         </div>
       </footer>
