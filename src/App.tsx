@@ -403,11 +403,33 @@ const App: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
+  const [navVisible, setNavVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   // Scroll to top when view changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [view]);
+
+  // Handle scroll behavior for category nav
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Show nav if scrolling up or near the top
+      if (currentScrollY < lastScrollY || currentScrollY < 100) {
+        setNavVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Hide nav if scrolling down
+        setNavVisible(false);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const handleCategoryClick = (cat: string) => {
     setSelectedCategory(cat);
@@ -466,7 +488,7 @@ const App: React.FC = () => {
       </header>
 
       {/* Category Navigation */}
-      <nav className="category-nav">
+      <nav className={`category-nav ${navVisible ? 'visible' : 'hidden'}`}>
         <div className="category-nav-container">
           <button className="category-nav-item active" onClick={() => handleCategoryClick('All Jewellery')}>
             <Gem size={16} /> All Jewellery
