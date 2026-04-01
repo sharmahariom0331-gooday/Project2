@@ -18,7 +18,11 @@ import {
   Filter,
   Eye,
   Download,
-  BarChart3
+  BarChart3,
+  Tag,
+  Truck,
+  CreditCard,
+  Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -72,6 +76,36 @@ interface Order {
   status: 'pending' | 'processing' | 'completed' | 'cancelled';
 }
 
+interface Category {
+  id: number;
+  name: string;
+  subcategories: string[];
+}
+
+interface Coupon {
+  id: number;
+  code: string;
+  discount: number;
+  discountType: 'percentage' | 'fixed';
+  expiryDate: string;
+  usageLimit: number;
+}
+
+interface PaymentMethod {
+  id: number;
+  name: string;
+  enabled: boolean;
+  charges: number;
+}
+
+interface DeliveryOption {
+  id: number;
+  name: string;
+  cost: string;
+  days: string;
+  enabled: boolean;
+}
+
 interface AdminPanelV2Props {
   products: Product[];
   setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
@@ -81,6 +115,14 @@ interface AdminPanelV2Props {
   setUsers: React.Dispatch<React.SetStateAction<User[]>>;
   orders: Order[];
   setOrders: React.Dispatch<React.SetStateAction<Order[]>>;
+  categories: Category[];
+  setCategories: React.Dispatch<React.SetStateAction<Category[]>>;
+  coupons: Coupon[];
+  setCoupons: React.Dispatch<React.SetStateAction<Coupon[]>>;
+  paymentMethods: PaymentMethod[];
+  setPaymentMethods: React.Dispatch<React.SetStateAction<PaymentMethod[]>>;
+  deliveryOptions: DeliveryOption[];
+  setDeliveryOptions: React.Dispatch<React.SetStateAction<DeliveryOption[]>>;
   adminEmail: string;
   onLogout: () => void;
 }
@@ -92,11 +134,23 @@ const AdminPanelV2: React.FC<AdminPanelV2Props> = ({
   setSettings,
   users,
   orders,
+  categories,
+  setCategories,
+  coupons,
+  setCoupons,
+  paymentMethods,
+  setPaymentMethods,
+  deliveryOptions,
+  setDeliveryOptions,
   adminEmail,
   onLogout
 }) => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'users' | 'orders' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'users' | 'orders' | 'categories' | 'coupons' | 'payment' | 'delivery' | 'settings'>('dashboard');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
+  const [editingPayment, setEditingPayment] = useState<PaymentMethod | null>(null);
+  const [editingDelivery, setEditingDelivery] = useState<DeliveryOption | null>(null);
   const [isAddingMode, setIsAddingMode] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -179,6 +233,38 @@ const AdminPanelV2: React.FC<AdminPanelV2Props> = ({
               <span>Orders ({orders.length})</span>
             </button>
             <button
+              className={`nav-item ${activeTab === 'categories' ? 'active' : ''}`}
+              onClick={() => setActiveTab('categories')}
+              title="Categories"
+            >
+              <Tag size={20} />
+              <span>Categories</span>
+            </button>
+            <button
+              className={`nav-item ${activeTab === 'coupons' ? 'active' : ''}`}
+              onClick={() => setActiveTab('coupons')}
+              title="Coupons"
+            >
+              <Zap size={20} />
+              <span>Coupons</span>
+            </button>
+            <button
+              className={`nav-item ${activeTab === 'payment' ? 'active' : ''}`}
+              onClick={() => setActiveTab('payment')}
+              title="Payment Methods"
+            >
+              <CreditCard size={20} />
+              <span>Payments</span>
+            </button>
+            <button
+              className={`nav-item ${activeTab === 'delivery' ? 'active' : ''}`}
+              onClick={() => setActiveTab('delivery')}
+              title="Delivery Options"
+            >
+              <Truck size={20} />
+              <span>Delivery</span>
+            </button>
+            <button
               className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
               onClick={() => setActiveTab('settings')}
               title="Settings"
@@ -210,6 +296,10 @@ const AdminPanelV2: React.FC<AdminPanelV2Props> = ({
               {activeTab === 'products' && 'Product Management'}
               {activeTab === 'users' && 'Customer Management'}
               {activeTab === 'orders' && 'Order Management'}
+              {activeTab === 'categories' && 'Categories & Subcategories'}
+              {activeTab === 'coupons' && 'Coupon Management'}
+              {activeTab === 'payment' && 'Payment Methods'}
+              {activeTab === 'delivery' && 'Delivery Options'}
               {activeTab === 'settings' && 'Website Settings'}
             </h2>
           </header>
@@ -428,6 +518,210 @@ const AdminPanelV2: React.FC<AdminPanelV2Props> = ({
                 </motion.div>
               )}
 
+              {activeTab === 'categories' && (
+                <motion.div
+                  key="categories"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <div className="section-header">
+                    <button className="btn-admin-add" onClick={() => {
+                      setEditingCategory({ id: 0, name: '', subcategories: [''] });
+                      setIsAddingMode(true);
+                    }}>
+                      <Plus size={18} /> Add Category
+                    </button>
+                  </div>
+
+                  <div className="table-wrapper">
+                    <table className="admin-table-v2">
+                      <thead>
+                        <tr>
+                          <th>Category Name</th>
+                          <th>Subcategories</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {categories.map(category => (
+                          <tr key={category.id}>
+                            <td className="bold">{category.name}</td>
+                            <td>{category.subcategories.join(', ')}</td>
+                            <td>
+                              <div className="action-buttons">
+                                <button className="btn-action edit" onClick={() => { setEditingCategory(category); setIsAddingMode(false); }} title="Edit"><Edit size={16} /></button>
+                                <button className="btn-action delete" onClick={() => {
+                                  if (window.confirm('Delete this category?')) {
+                                    setCategories(categories.filter(c => c.id !== category.id));
+                                  }
+                                }} title="Delete"><Trash2 size={16} /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeTab === 'coupons' && (
+                <motion.div
+                  key="coupons"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <div className="section-header">
+                    <button className="btn-admin-add" onClick={() => {
+                      setEditingCoupon({ id: 0, code: '', discount: 0, discountType: 'percentage', expiryDate: '', usageLimit: 0 });
+                      setIsAddingMode(true);
+                    }}>
+                      <Plus size={18} /> Add Coupon
+                    </button>
+                  </div>
+
+                  <div className="table-wrapper">
+                    <table className="admin-table-v2">
+                      <thead>
+                        <tr>
+                          <th>Code</th>
+                          <th>Discount</th>
+                          <th>Type</th>
+                          <th>Expiry Date</th>
+                          <th>Usage Limit</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {coupons.map(coupon => (
+                          <tr key={coupon.id}>
+                            <td className="bold">{coupon.code}</td>
+                            <td>{coupon.discount}</td>
+                            <td><span className="badge badge-blue">{coupon.discountType}</span></td>
+                            <td>{coupon.expiryDate}</td>
+                            <td>{coupon.usageLimit}</td>
+                            <td>
+                              <div className="action-buttons">
+                                <button className="btn-action edit" onClick={() => { setEditingCoupon(coupon); setIsAddingMode(false); }} title="Edit"><Edit size={16} /></button>
+                                <button className="btn-action delete" onClick={() => {
+                                  if (window.confirm('Delete this coupon?')) {
+                                    setCoupons(coupons.filter(c => c.id !== coupon.id));
+                                  }
+                                }} title="Delete"><Trash2 size={16} /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeTab === 'payment' && (
+                <motion.div
+                  key="payment"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <div className="section-header">
+                    <button className="btn-admin-add" onClick={() => {
+                      setEditingPayment({ id: 0, name: '', enabled: true, charges: 0 });
+                      setIsAddingMode(true);
+                    }}>
+                      <Plus size={18} /> Add Payment Method
+                    </button>
+                  </div>
+
+                  <div className="table-wrapper">
+                    <table className="admin-table-v2">
+                      <thead>
+                        <tr>
+                          <th>Payment Method</th>
+                          <th>Status</th>
+                          <th>Charges (%)</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {paymentMethods.map(method => (
+                          <tr key={method.id}>
+                            <td className="bold">{method.name}</td>
+                            <td><span className={`badge badge-${method.enabled ? 'green' : 'red'}`}>{method.enabled ? 'Enabled' : 'Disabled'}</span></td>
+                            <td>{method.charges}%</td>
+                            <td>
+                              <div className="action-buttons">
+                                <button className="btn-action edit" onClick={() => { setEditingPayment(method); setIsAddingMode(false); }} title="Edit"><Edit size={16} /></button>
+                                <button className="btn-action delete" onClick={() => {
+                                  if (window.confirm('Delete this payment method?')) {
+                                    setPaymentMethods(paymentMethods.filter(p => p.id !== method.id));
+                                  }
+                                }} title="Delete"><Trash2 size={16} /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeTab === 'delivery' && (
+                <motion.div
+                  key="delivery"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <div className="section-header">
+                    <button className="btn-admin-add" onClick={() => {
+                      setEditingDelivery({ id: 0, name: '', cost: '₹ 0', days: '5-7', enabled: true });
+                      setIsAddingMode(true);
+                    }}>
+                      <Plus size={18} /> Add Delivery Option
+                    </button>
+                  </div>
+
+                  <div className="table-wrapper">
+                    <table className="admin-table-v2">
+                      <thead>
+                        <tr>
+                          <th>Delivery Type</th>
+                          <th>Cost</th>
+                          <th>Days</th>
+                          <th>Status</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {deliveryOptions.map(option => (
+                          <tr key={option.id}>
+                            <td className="bold">{option.name}</td>
+                            <td>{option.cost}</td>
+                            <td>{option.days}</td>
+                            <td><span className={`badge badge-${option.enabled ? 'green' : 'red'}`}>{option.enabled ? 'Enabled' : 'Disabled'}</span></td>
+                            <td>
+                              <div className="action-buttons">
+                                <button className="btn-action edit" onClick={() => { setEditingDelivery(option); setIsAddingMode(false); }} title="Edit"><Edit size={16} /></button>
+                                <button className="btn-action delete" onClick={() => {
+                                  if (window.confirm('Delete this delivery option?')) {
+                                    setDeliveryOptions(deliveryOptions.filter(d => d.id !== option.id));
+                                  }
+                                }} title="Delete"><Trash2 size={16} /></button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </motion.div>
+              )}
+
               {activeTab === 'settings' && (
                 <motion.div
                   key="settings"
@@ -599,6 +893,273 @@ const AdminPanelV2: React.FC<AdminPanelV2Props> = ({
                 <div className="modal-actions">
                   <button type="button" className="btn-cancel" onClick={() => setEditingProduct(null)}>Cancel</button>
                   <button type="submit" className="btn-save-modal"><Save size={18} /> Save Product</button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+
+        {editingCategory && (
+          <div className="modal-overlay-v2">
+            <motion.div
+              className="admin-modal-v2"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+            >
+              <div className="modal-header-v2">
+                <h3>{isAddingMode ? 'Add New Category' : 'Edit Category'}</h3>
+                <button className="close-btn" onClick={() => setEditingCategory(null)}><X size={24} /></button>
+              </div>
+              <form className="modal-form-v2" onSubmit={(e) => {
+                e.preventDefault();
+                if (editingCategory) {
+                  if (isAddingMode) {
+                    setCategories([...categories, { ...editingCategory, id: Date.now() }]);
+                  } else {
+                    setCategories(categories.map(c => c.id === editingCategory.id ? editingCategory : c));
+                  }
+                  setEditingCategory(null);
+                  setIsAddingMode(false);
+                }
+              }}>
+                <div className="form-grid-v2">
+                  <div className="form-group-v2 full">
+                    <label>Category Name *</label>
+                    <input
+                      required
+                      value={editingCategory.name}
+                      onChange={e => setEditingCategory({ ...editingCategory, name: e.target.value })}
+                      placeholder="e.g., Gold"
+                    />
+                  </div>
+                  <div className="form-group-v2 full">
+                    <label>Subcategories (comma-separated)</label>
+                    <input
+                      value={editingCategory.subcategories.join(', ')}
+                      onChange={e => setEditingCategory({ ...editingCategory, subcategories: e.target.value.split(',').map(s => s.trim()) })}
+                      placeholder="e.g., Earrings, Rings, Necklaces"
+                    />
+                  </div>
+                </div>
+                <div className="modal-actions">
+                  <button type="button" className="btn-cancel" onClick={() => setEditingCategory(null)}>Cancel</button>
+                  <button type="submit" className="btn-save-modal"><Save size={18} /> Save Category</button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+
+        {editingCoupon && (
+          <div className="modal-overlay-v2">
+            <motion.div
+              className="admin-modal-v2"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+            >
+              <div className="modal-header-v2">
+                <h3>{isAddingMode ? 'Add New Coupon' : 'Edit Coupon'}</h3>
+                <button className="close-btn" onClick={() => setEditingCoupon(null)}><X size={24} /></button>
+              </div>
+              <form className="modal-form-v2" onSubmit={(e) => {
+                e.preventDefault();
+                if (editingCoupon) {
+                  if (isAddingMode) {
+                    setCoupons([...coupons, { ...editingCoupon, id: Date.now() }]);
+                  } else {
+                    setCoupons(coupons.map(c => c.id === editingCoupon.id ? editingCoupon : c));
+                  }
+                  setEditingCoupon(null);
+                  setIsAddingMode(false);
+                }
+              }}>
+                <div className="form-grid-v2">
+                  <div className="form-group-v2">
+                    <label>Coupon Code *</label>
+                    <input
+                      required
+                      value={editingCoupon.code}
+                      onChange={e => setEditingCoupon({ ...editingCoupon, code: e.target.value })}
+                      placeholder="e.g., WELCOME10"
+                    />
+                  </div>
+                  <div className="form-group-v2">
+                    <label>Discount Value *</label>
+                    <input
+                      required
+                      type="number"
+                      value={editingCoupon.discount}
+                      onChange={e => setEditingCoupon({ ...editingCoupon, discount: parseInt(e.target.value) })}
+                      placeholder="10"
+                    />
+                  </div>
+                  <div className="form-group-v2">
+                    <label>Discount Type</label>
+                    <select value={editingCoupon.discountType} onChange={e => setEditingCoupon({ ...editingCoupon, discountType: e.target.value as 'percentage' | 'fixed' })}>
+                      <option value="percentage">Percentage (%)</option>
+                      <option value="fixed">Fixed (₹)</option>
+                    </select>
+                  </div>
+                  <div className="form-group-v2">
+                    <label>Expiry Date *</label>
+                    <input
+                      required
+                      type="date"
+                      value={editingCoupon.expiryDate}
+                      onChange={e => setEditingCoupon({ ...editingCoupon, expiryDate: e.target.value })}
+                    />
+                  </div>
+                  <div className="form-group-v2 full">
+                    <label>Usage Limit</label>
+                    <input
+                      type="number"
+                      value={editingCoupon.usageLimit}
+                      onChange={e => setEditingCoupon({ ...editingCoupon, usageLimit: parseInt(e.target.value) })}
+                      placeholder="100"
+                    />
+                  </div>
+                </div>
+                <div className="modal-actions">
+                  <button type="button" className="btn-cancel" onClick={() => setEditingCoupon(null)}>Cancel</button>
+                  <button type="submit" className="btn-save-modal"><Save size={18} /> Save Coupon</button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+
+        {editingPayment && (
+          <div className="modal-overlay-v2">
+            <motion.div
+              className="admin-modal-v2"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+            >
+              <div className="modal-header-v2">
+                <h3>{isAddingMode ? 'Add Payment Method' : 'Edit Payment Method'}</h3>
+                <button className="close-btn" onClick={() => setEditingPayment(null)}><X size={24} /></button>
+              </div>
+              <form className="modal-form-v2" onSubmit={(e) => {
+                e.preventDefault();
+                if (editingPayment) {
+                  if (isAddingMode) {
+                    setPaymentMethods([...paymentMethods, { ...editingPayment, id: Date.now() }]);
+                  } else {
+                    setPaymentMethods(paymentMethods.map(p => p.id === editingPayment.id ? editingPayment : p));
+                  }
+                  setEditingPayment(null);
+                  setIsAddingMode(false);
+                }
+              }}>
+                <div className="form-grid-v2">
+                  <div className="form-group-v2">
+                    <label>Payment Method Name *</label>
+                    <input
+                      required
+                      value={editingPayment.name}
+                      onChange={e => setEditingPayment({ ...editingPayment, name: e.target.value })}
+                      placeholder="e.g., Credit Card"
+                    />
+                  </div>
+                  <div className="form-group-v2">
+                    <label>Charges (%)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={editingPayment.charges}
+                      onChange={e => setEditingPayment({ ...editingPayment, charges: parseFloat(e.target.value) })}
+                      placeholder="1.5"
+                    />
+                  </div>
+                  <div className="form-group-v2 full">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={editingPayment.enabled}
+                        onChange={e => setEditingPayment({ ...editingPayment, enabled: e.target.checked })}
+                      />
+                      {' '}Enable this payment method
+                    </label>
+                  </div>
+                </div>
+                <div className="modal-actions">
+                  <button type="button" className="btn-cancel" onClick={() => setEditingPayment(null)}>Cancel</button>
+                  <button type="submit" className="btn-save-modal"><Save size={18} /> Save Payment Method</button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+
+        {editingDelivery && (
+          <div className="modal-overlay-v2">
+            <motion.div
+              className="admin-modal-v2"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+            >
+              <div className="modal-header-v2">
+                <h3>{isAddingMode ? 'Add Delivery Option' : 'Edit Delivery Option'}</h3>
+                <button className="close-btn" onClick={() => setEditingDelivery(null)}><X size={24} /></button>
+              </div>
+              <form className="modal-form-v2" onSubmit={(e) => {
+                e.preventDefault();
+                if (editingDelivery) {
+                  if (isAddingMode) {
+                    setDeliveryOptions([...deliveryOptions, { ...editingDelivery, id: Date.now() }]);
+                  } else {
+                    setDeliveryOptions(deliveryOptions.map(d => d.id === editingDelivery.id ? editingDelivery : d));
+                  }
+                  setEditingDelivery(null);
+                  setIsAddingMode(false);
+                }
+              }}>
+                <div className="form-grid-v2">
+                  <div className="form-group-v2">
+                    <label>Delivery Type *</label>
+                    <input
+                      required
+                      value={editingDelivery.name}
+                      onChange={e => setEditingDelivery({ ...editingDelivery, name: e.target.value })}
+                      placeholder="e.g., Standard Delivery"
+                    />
+                  </div>
+                  <div className="form-group-v2">
+                    <label>Cost *</label>
+                    <input
+                      required
+                      value={editingDelivery.cost}
+                      onChange={e => setEditingDelivery({ ...editingDelivery, cost: e.target.value })}
+                      placeholder="₹ 0"
+                    />
+                  </div>
+                  <div className="form-group-v2">
+                    <label>Days *</label>
+                    <input
+                      required
+                      value={editingDelivery.days}
+                      onChange={e => setEditingDelivery({ ...editingDelivery, days: e.target.value })}
+                      placeholder="5-7 days"
+                    />
+                  </div>
+                  <div className="form-group-v2 full">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={editingDelivery.enabled}
+                        onChange={e => setEditingDelivery({ ...editingDelivery, enabled: e.target.checked })}
+                      />
+                      {' '}Enable this delivery option
+                    </label>
+                  </div>
+                </div>
+                <div className="modal-actions">
+                  <button type="button" className="btn-cancel" onClick={() => setEditingDelivery(null)}>Cancel</button>
+                  <button type="submit" className="btn-save-modal"><Save size={18} /> Save Delivery Option</button>
                 </div>
               </form>
             </motion.div>

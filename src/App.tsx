@@ -154,6 +154,36 @@ interface Order {
   status: 'pending' | 'processing' | 'completed' | 'cancelled';
 }
 
+interface Category {
+  id: number;
+  name: string;
+  subcategories: string[];
+}
+
+interface Coupon {
+  id: number;
+  code: string;
+  discount: number;
+  discountType: 'percentage' | 'fixed';
+  expiryDate: string;
+  usageLimit: number;
+}
+
+interface PaymentMethod {
+  id: number;
+  name: string;
+  enabled: boolean;
+  charges: number;
+}
+
+interface DeliveryOption {
+  id: number;
+  name: string;
+  cost: string;
+  days: string;
+  enabled: boolean;
+}
+
 const ProductListing: React.FC<{ category: string; products: Product[]; onBack: () => void; onProductClick: (product: Product) => void }> = ({ category, products, onBack, onProductClick }) => {
   return (
     <motion.div
@@ -450,6 +480,28 @@ const App: React.FC = () => {
     { id: 1001, userId: 1, userName: 'Raj Kumar', productName: 'Exquisite Gold Gheroo Haram', price: '₹ 706,345', quantity: 1, date: '2024-03-20', status: 'completed' },
     { id: 1002, userId: 2, userName: 'Priya Singh', productName: 'Spectacular Leaf Pattern Gold Haram', price: '₹ 1,496,571', quantity: 1, date: '2024-03-18', status: 'processing' },
     { id: 1003, userId: 1, userName: 'Raj Kumar', productName: 'Ornate Rhythm Gold Haram', price: '₹ 850,000', quantity: 2, date: '2024-03-15', status: 'completed' }
+  ]);
+  const [categories, setCategories] = useState<Category[]>([
+    { id: 1, name: 'Gold', subcategories: ['Earrings', 'Rings', 'Necklaces', 'Bracelets'] },
+    { id: 2, name: 'Diamond', subcategories: ['Solitaire', 'Halo', 'Three Stone'] },
+    { id: 3, name: 'Wedding', subcategories: ['Bridal', 'Groom', 'Couples'] },
+    { id: 4, name: 'Mangalsutra', subcategories: ['Traditional', 'Modern', 'Lightweight'] }
+  ]);
+  const [coupons, setCoupons] = useState<Coupon[]>([
+    { id: 1, code: 'WELCOME10', discount: 10, discountType: 'percentage', expiryDate: '2024-12-31', usageLimit: 100 },
+    { id: 2, code: 'BULK15', discount: 15, discountType: 'percentage', expiryDate: '2024-12-31', usageLimit: 50 }
+  ]);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
+    { id: 1, name: 'Credit Card', enabled: true, charges: 1.5 },
+    { id: 2, name: 'Debit Card', enabled: true, charges: 1.0 },
+    { id: 3, name: 'UPI', enabled: true, charges: 0 },
+    { id: 4, name: 'Net Banking', enabled: true, charges: 1.2 },
+    { id: 5, name: 'Wallet', enabled: true, charges: 0 }
+  ]);
+  const [deliveryOptions, setDeliveryOptions] = useState<DeliveryOption[]>([
+    { id: 1, name: 'Standard Delivery', cost: '₹ 0', days: '5-7 days', enabled: true },
+    { id: 2, name: 'Express Delivery', cost: '₹ 200', days: '2-3 days', enabled: true },
+    { id: 3, name: 'Next Day Delivery', cost: '₹ 500', days: '1 day', enabled: true }
   ]);
 
   // Handle URL-based routing
@@ -1007,6 +1059,14 @@ const App: React.FC = () => {
               setUsers={setUsers}
               orders={orders}
               setOrders={setOrders}
+              categories={categories}
+              setCategories={setCategories}
+              coupons={coupons}
+              setCoupons={setCoupons}
+              paymentMethods={paymentMethods}
+              setPaymentMethods={setPaymentMethods}
+              deliveryOptions={deliveryOptions}
+              setDeliveryOptions={setDeliveryOptions}
               adminEmail={adminEmail}
               onLogout={handleAdminLogout}
             />
