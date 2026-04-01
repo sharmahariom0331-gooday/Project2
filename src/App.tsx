@@ -550,7 +550,7 @@ const App: React.FC = () => {
                 <p>Sparkle through the events with timeless diamonds</p>
               </div>
               <div className="trending-layout">
-                <div className="trending-large" style={{ cursor: 'pointer' }}>
+                <div className="trending-large" style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick('Statement Necklaces')}>
                   <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1000" alt="Necklace" />
                   <div className="trending-info-overlay">
                     <h3 className="trending-main-title">Statement Necklaces</h3>
@@ -558,19 +558,19 @@ const App: React.FC = () => {
                   </div>
                 </div>
                 <div className="trending-small-grid">
-                  <div className="blue-tile">
+                  <div className="blue-tile" style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick('Sleek Rings')}>
                     <h3>Sleek Rings</h3>
                     <p>Starting from ₹ 10,080*</p>
                   </div>
-                  <div className="blue-tile">
+                  <div className="blue-tile" style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick('Elegant Bangles')}>
                     <h3>Elegant Bangles</h3>
                     <p>Starting from ₹ 36,200*</p>
                   </div>
-                  <div className="blue-tile">
+                  <div className="blue-tile" style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick('Stunning Earrings')}>
                     <h3>Stunning Earrings</h3>
                     <p>Starting from ₹ 10,917*</p>
                   </div>
-                  <div className="gradient-tile">
+                  <div className="gradient-tile" style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick('Stylish Mangalsutras')}>
                     <img src="https://images.unsplash.com/photo-1611085583191-a3b13b244821?q=80&w=400" alt="Bangle" />
                     <div className="info">
                       <h3>Stylish Mangalsutras</h3>
@@ -588,7 +588,7 @@ const App: React.FC = () => {
                   { name: 'PENDANTS', img: 'https://images.unsplash.com/photo-1599643477877-537ef527848b?q=80&w=400' },
                   { name: 'MANGALSUTRA', img: 'https://images.unsplash.com/photo-1611085583191-a3b13b244821?q=80&w=400' },
                 ].map((item, i) => (
-                  <div className="cat-card-v4" key={i}>
+                  <div className="cat-card-v4" key={i} style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick(item.name)}>
                     <div className="cat-img-box-v4"><img src={item.img} alt={item.name} /></div>
                     <span className="cat-label-v4">{item.name}</span>
                   </div>
@@ -629,15 +629,15 @@ const App: React.FC = () => {
               </div>
               <div className="seasonal-layout">
                 <div className="trending-small-grid">
-                  <div className="blue-tile"><h3>Floral Rings</h3><p>₹ 15,000</p></div>
-                  <div className="blue-tile"><h3>Daily Bangles</h3><p>₹ 40,000</p></div>
-                  <div className="blue-tile"><h3>Ruby Earrings</h3><p>₹ 22,000</p></div>
-                  <div className="gradient-tile">
+                  <div className="blue-tile" style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick('Floral Rings')}><h3>Floral Rings</h3><p>₹ 15,000</p></div>
+                  <div className="blue-tile" style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick('Daily Bangles')}><h3>Daily Bangles</h3><p>₹ 40,000</p></div>
+                  <div className="blue-tile" style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick('Ruby Earrings')}><h3>Ruby Earrings</h3><p>₹ 22,000</p></div>
+                  <div className="gradient-tile" style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick('Gold Chains')}>
                     <img src="https://images.unsplash.com/photo-1611085583191-a3b13b244821?q=80&w=400" alt="Bangle" />
                     <div className="info"><h3>Gold Chains</h3><p>₹ 30,000</p></div>
                   </div>
                 </div>
-                <div className="trending-large">
+                <div className="trending-large" style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick('Traditional Chokers')}>
                   <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1000" alt="Choker" />
                   <div className="trending-info-overlay">
                     <h3 className="trending-main-title">Traditional Chokers</h3>
@@ -654,7 +654,7 @@ const App: React.FC = () => {
                   { name: 'PENDANTS', img: 'https://images.unsplash.com/photo-1599643477877-537ef527848b?q=80&w=400' },
                   { name: 'MANGALSUTRA', img: 'https://images.unsplash.com/photo-1611085583191-a3b13b244821?q=80&w=400' },
                 ].map((item, i) => (
-                  <div className="cat-card-v4" key={i}>
+                  <div className="cat-card-v4" key={i} style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick(item.name)}>
                     <div className="cat-img-box-v4"><img src={item.img} alt={item.name} /></div>
                     <span className="cat-label-v4">{item.name}</span>
                   </div>
@@ -666,23 +666,23 @@ const App: React.FC = () => {
             <section className="section-container">
               <div className="center-title"><h2 className="section-title blue-text">Gifting & More</h2><p className="section-subtitle">Gifts that mark a moment</p></div>
               <div className="gifting-grid-v2">
-                <div className="gifting-tile-v2 bg-cream gift-split" onClick={() => handleCategoryClick('Birthday Gifts')}>
+                <div className="gifting-tile-v2 bg-cream gift-split" style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick('Birthday Gifts')}>
                   <img src="https://images.unsplash.com/photo-1599643477877-537ef527848b?q=80&w=200" alt="Birthday" />
                   <div className="gift-text"><h3>Birthday</h3></div>
                 </div>
-                <div className="gifting-tile-v2 bg-cream text-center" onClick={() => handleCategoryClick('Anniversary Gifts')}>
+                <div className="gifting-tile-v2 bg-cream text-center" style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick('Anniversary Gifts')}>
                   <img src="https://cdn.builder.io/api/v1/image/assets%2Fb9cea9b922974557858568df8bd7471e%2F4bf7e8859c8c474e9ba4b56dff9ab174?format=webp&width=800&height=1200" alt="Anniversary" />
                   <h3>Anniversary</h3>
                 </div>
-                <div className="gifting-tile-v2 tall-tile" onClick={() => handleCategoryClick('Personalised Jewellery')}>
+                <div className="gifting-tile-v2 tall-tile" style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick('Personalised Jewellery')}>
                   <img src="https://images.unsplash.com/photo-1611591439812-42999427184a?q=80&w=600" alt="Personalised" />
                   <div className="tile-title-bottom"><h3>Personalised Jewellery</h3></div>
                 </div>
-                <div className="gifting-tile-v2 bg-cream text-center" onClick={() => handleCategoryClick('Baby Birth Gifts')}>
+                <div className="gifting-tile-v2 bg-cream text-center" style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick('Baby Birth Gifts')}>
                   <img src="https://cdn.builder.io/api/v1/image/assets%2Fb9cea9b922974557858568df8bd7471e%2F4bf7e8859c8c474e9ba4b56dff9ab174?format=webp&width=800&height=1200" alt="Baby Birth" />
                   <h3>Baby Birth</h3>
                 </div>
-                <div className="gifting-tile-v2 bg-cream gift-split" onClick={() => handleCategoryClick('Festive Collection')}>
+                <div className="gifting-tile-v2 bg-cream gift-split" style={{ cursor: 'pointer' }} onClick={() => handleCategoryClick('Festive Collection')}>
                   <div className="gift-text"><h3>Festive collection</h3></div>
                   <img src="https://images.unsplash.com/photo-1611085583191-a3b13b244821?q=80&w=200" alt="Festive" />
                 </div>
