@@ -537,6 +537,7 @@ const App: React.FC = () => {
                         <div className="bracket-dec"></div>
                       </div>
                     </div>
+                    <img src="https://cdn.builder.io/api/v1/image/assets%2Fb9cea9b922974557858568df8bd7471e%2F4bf7e8859c8c474e9ba4b56dff9ab174?format=webp&width=800&height=1200" alt="Kids" />
                   </motion.div>
                 </div>
               </div>
@@ -670,6 +671,7 @@ const App: React.FC = () => {
                   <div className="gift-text"><h3>Birthday</h3></div>
                 </div>
                 <div className="gifting-tile-v2 bg-cream text-center" onClick={() => handleCategoryClick('Anniversary Gifts')}>
+                  <img src="https://cdn.builder.io/api/v1/image/assets%2Fb9cea9b922974557858568df8bd7471e%2F4bf7e8859c8c474e9ba4b56dff9ab174?format=webp&width=800&height=1200" alt="Anniversary" />
                   <h3>Anniversary</h3>
                 </div>
                 <div className="gifting-tile-v2 tall-tile" onClick={() => handleCategoryClick('Personalised Jewellery')}>
@@ -677,6 +679,7 @@ const App: React.FC = () => {
                   <div className="tile-title-bottom"><h3>Personalised Jewellery</h3></div>
                 </div>
                 <div className="gifting-tile-v2 bg-cream text-center" onClick={() => handleCategoryClick('Baby Birth Gifts')}>
+                  <img src="https://cdn.builder.io/api/v1/image/assets%2Fb9cea9b922974557858568df8bd7471e%2F4bf7e8859c8c474e9ba4b56dff9ab174?format=webp&width=800&height=1200" alt="Baby Birth" />
                   <h3>Baby Birth</h3>
                 </div>
                 <div className="gifting-tile-v2 bg-cream gift-split" onClick={() => handleCategoryClick('Festive Collection')}>
