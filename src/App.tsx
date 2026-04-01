@@ -403,11 +403,33 @@ const App: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
+  const [navVisible, setNavVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   // Scroll to top when view changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [view]);
+
+  // Handle scroll behavior for category nav
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Show nav if scrolling up or near the top
+      if (currentScrollY < lastScrollY || currentScrollY < 100) {
+        setNavVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Hide nav if scrolling down
+        setNavVisible(false);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const handleCategoryClick = (cat: string) => {
     setSelectedCategory(cat);
@@ -434,6 +456,73 @@ const App: React.FC = () => {
 
   return (
     <div className="akshima-app">
+      {/* Header */}
+      <header className="header">
+        <div className="header-container">
+          <div className="logo-section">
+            <a href="#" className="logo-link" onClick={(e) => { e.preventDefault(); handleBackToHome(); }}>
+              <span className="header-logo-text">{settings.siteName}</span>
+            </a>
+          </div>
+
+          <div className="search-bar">
+            <Search size={18} />
+            <input type="text" placeholder="Search for gold necklace" />
+          </div>
+
+          <div className="header-icons">
+            <button className="icon-btn" title="Stores">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+            </button>
+            <button className="icon-btn" title="Wishlist"><Heart size={20} /></button>
+            <button className="icon-btn" title="Account"><User size={20} /></button>
+            <button className="icon-btn cart-icon" title="Cart">
+              <ShoppingBag size={20} />
+              <span className="cart-count">0</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Category Navigation */}
+      <nav className={`category-nav ${navVisible ? 'visible' : 'hidden'}`}>
+        <div className="category-nav-container">
+          <button className="category-nav-item active" onClick={() => handleCategoryClick('All Jewellery')}>
+            <Gem size={16} /> All Jewellery
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('Gold')}>
+            <Gem size={16} /> Gold
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('Diamond')}>
+            <Gem size={16} /> Diamond
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('Earrings')}>
+            <Gem size={16} /> Earrings
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('Rings')}>
+            <Gem size={16} /> Rings
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('Daily Wear')}>
+            <Gem size={16} /> Daily Wear
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('Gemstone')}>
+            <Gem size={16} /> Gemstone
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('Wedding')}>
+            <Gem size={16} /> Wedding
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('Gifting')}>
+            <Gem size={16} /> Gifting
+          </button>
+          <button className="category-nav-item" onClick={() => handleCategoryClick('More')}>
+            <Gem size={16} /> More <ChevronDown size={14} style={{ marginLeft: '4px' }} />
+          </button>
+        </div>
+      </nav>
+
       <AnimatePresence mode="wait">
         {view === 'home' && (
           <motion.div
