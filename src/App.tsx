@@ -154,6 +154,36 @@ interface Order {
   status: 'pending' | 'processing' | 'completed' | 'cancelled';
 }
 
+interface Category {
+  id: number;
+  name: string;
+  subcategories: string[];
+}
+
+interface Coupon {
+  id: number;
+  code: string;
+  discount: number;
+  discountType: 'percentage' | 'fixed';
+  expiryDate: string;
+  usageLimit: number;
+}
+
+interface PaymentMethod {
+  id: number;
+  name: string;
+  enabled: boolean;
+  charges: number;
+}
+
+interface DeliveryOption {
+  id: number;
+  name: string;
+  cost: string;
+  days: string;
+  enabled: boolean;
+}
+
 const ProductListing: React.FC<{ category: string; products: Product[]; onBack: () => void; onProductClick: (product: Product) => void }> = ({ category, products, onBack, onProductClick }) => {
   return (
     <motion.div
@@ -287,7 +317,7 @@ const ProductDetail: React.FC<{ product: Product; products: Product[]; onBack: (
                 alt={product.name}
               />
               <div className="wishlist-float" onClick={() => onWishlist(product.id)} style={{ cursor: 'pointer' }}>
-                <Heart size={20} fill={isWishlisted ? "currentColor" : "none"} color={isWishlisted ? "#ff4757" : "currentColor"} className={wishlisted === product.id ? 'blinking-heart' : ''} />
+                <Heart size={20} fill={isWishlisted ? "currentColor" : "none"} color={isWishlisted ? "#ff4757" : "currentColor"} />
               </div>
             </div>
           </div>
@@ -363,7 +393,7 @@ const ProductDetail: React.FC<{ product: Product; products: Product[]; onBack: (
             <div className="cta-row">
               <button className="btn-outline-maroon" onClick={onAddToCart}><ShoppingBag size={18} /> ADD TO BAG</button>
               <button className="btn-fill-maroon" onClick={() => onBuyNow(product)}>BUY NOW</button>
-              <div className="wishlist-btn-circle" onClick={() => onWishlist(product.id)} style={{ cursor: 'pointer' }}><Heart size={20} fill={isWishlisted ? "currentColor" : "none"} color={isWishlisted ? "#ff4757" : "currentColor"} className={wishlisted === product.id ? 'blinking-heart' : ''} /></div>
+              <div className="wishlist-btn-circle" onClick={() => onWishlist(product.id)} style={{ cursor: 'pointer' }}><Heart size={20} fill={isWishlisted ? "currentColor" : "none"} color={isWishlisted ? "#ff4757" : "currentColor"} /></div>
             </div>
           </div>
         </div>
@@ -428,6 +458,8 @@ const ProductDetail: React.FC<{ product: Product; products: Product[]; onBack: (
 const App: React.FC = () => {
   const [view, setView] = useState<'home' | 'listing' | 'detail' | 'admin' | 'checkout' | 'dashboard'>('home');
   const [selectedCategory, setSelectedCategory] = useState<string>('Rivaah');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
+  const [expandedCategoryId, setExpandedCategoryId] = useState<number | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
@@ -450,6 +482,28 @@ const App: React.FC = () => {
     { id: 1001, userId: 1, userName: 'Raj Kumar', productName: 'Exquisite Gold Gheroo Haram', price: '₹ 706,345', quantity: 1, date: '2024-03-20', status: 'completed' },
     { id: 1002, userId: 2, userName: 'Priya Singh', productName: 'Spectacular Leaf Pattern Gold Haram', price: '₹ 1,496,571', quantity: 1, date: '2024-03-18', status: 'processing' },
     { id: 1003, userId: 1, userName: 'Raj Kumar', productName: 'Ornate Rhythm Gold Haram', price: '₹ 850,000', quantity: 2, date: '2024-03-15', status: 'completed' }
+  ]);
+  const [categories, setCategories] = useState<Category[]>([
+    { id: 1, name: 'Gold', subcategories: ['Earrings', 'Rings', 'Necklaces', 'Bracelets'] },
+    { id: 2, name: 'Diamond', subcategories: ['Solitaire', 'Halo', 'Three Stone'] },
+    { id: 3, name: 'Wedding', subcategories: ['Bridal', 'Groom', 'Couples'] },
+    { id: 4, name: 'Mangalsutra', subcategories: ['Traditional', 'Modern', 'Lightweight'] }
+  ]);
+  const [coupons, setCoupons] = useState<Coupon[]>([
+    { id: 1, code: 'WELCOME10', discount: 10, discountType: 'percentage', expiryDate: '2024-12-31', usageLimit: 100 },
+    { id: 2, code: 'BULK15', discount: 15, discountType: 'percentage', expiryDate: '2024-12-31', usageLimit: 50 }
+  ]);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
+    { id: 1, name: 'Credit Card', enabled: true, charges: 1.5 },
+    { id: 2, name: 'Debit Card', enabled: true, charges: 1.0 },
+    { id: 3, name: 'UPI', enabled: true, charges: 0 },
+    { id: 4, name: 'Net Banking', enabled: true, charges: 1.2 },
+    { id: 5, name: 'Wallet', enabled: true, charges: 0 }
+  ]);
+  const [deliveryOptions, setDeliveryOptions] = useState<DeliveryOption[]>([
+    { id: 1, name: 'Standard Delivery', cost: '₹ 0', days: '5-7 days', enabled: true },
+    { id: 2, name: 'Express Delivery', cost: '₹ 200', days: '2-3 days', enabled: true },
+    { id: 3, name: 'Next Day Delivery', cost: '₹ 500', days: '1 day', enabled: true }
   ]);
 
   // Handle URL-based routing
@@ -678,26 +732,58 @@ const App: React.FC = () => {
                 <h2 className="section-title">Find Your Perfect Match</h2>
                 <p className="section-subtitle">Shop by Categories</p>
               </div>
-              <div className="categories-grid">
-                {[
-                  { name: 'EARRINGS', img: 'https://images.unsplash.com/photo-1635767798638-3e25273a8236?q=80&w=200' },
-                  { name: 'FINGER RINGS', img: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=80&w=200' },
-                  { name: 'PENDANTS', img: 'https://images.unsplash.com/photo-1599643477877-537ef527848b?q=80&w=200' },
-                  { name: 'MANGALSUTRA', img: 'https://images.unsplash.com/photo-1598560912005-5976593c6831?q=80&w=200' },
-                  { name: 'BRACELETS', img: 'https://images.unsplash.com/photo-1611085583191-a3b13b244821?q=80&w=200' },
-                  { name: 'BANGLES', img: 'https://images.unsplash.com/photo-1611085583191-a3b13b244821?q=80&w=200' },
-                  { name: 'CHAINS', img: 'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?q=80&w=200' },
-                ].map((cat, i) => (
-                  <div className="category-card" key={i} onClick={() => handleCategoryClick(cat.name)} style={{ cursor: 'pointer' }}>
-                    <div className="category-img"><img src={cat.img} alt={cat.name} /></div>
-                    <span>{cat.name}</span>
+
+              {expandedCategoryId === null ? (
+                <div className="categories-grid">
+                  {categories.map((cat) => (
+                    <div
+                      key={cat.id}
+                      className="category-card"
+                      onClick={() => setExpandedCategoryId(cat.id)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className="category-img">
+                        <img src={`https://images.unsplash.com/photo-${cat.id === 1 ? '1611085583191-a3b13b244821' : cat.id === 2 ? '1599643477877-537ef527848b' : cat.id === 3 ? '1598560912005-5976593c6831' : '1635767798638-3e25273a8236'}?q=80&w=200`} alt={cat.name} />
+                      </div>
+                      <span>{cat.name}</span>
+                      <small className="subcategory-count">{cat.subcategories.length} subcategories</small>
+                    </div>
+                  ))}
+                  <div className="category-card view-all" onClick={() => handleCategoryClick('All Categories')} style={{ cursor: 'pointer' }}>
+                    <div className="category-img"><span className="count">{categories.length}</span><small>CATEGORIES</small></div>
+                    <span>VIEW ALL</span>
                   </div>
-                ))}
-                <div className="category-card view-all" onClick={() => handleCategoryClick('All Categories')} style={{ cursor: 'pointer' }}>
-                  <div className="category-img"><span className="count">10+</span><small>CATEGORIES</small></div>
-                  <span>VIEW ALL</span>
                 </div>
-              </div>
+              ) : (
+                <div className="subcategory-view">
+                  <button className="btn-back-categories" onClick={() => setExpandedCategoryId(null)}>
+                    ← Back to Categories
+                  </button>
+                  <h3 className="subcategory-title">
+                    {categories.find(c => c.id === expandedCategoryId)?.name} Jewellery
+                  </h3>
+                  <div className="subcategories-grid">
+                    {categories.find(c => c.id === expandedCategoryId)?.subcategories.map((subcat, idx) => (
+                      <div
+                        key={idx}
+                        className="subcategory-card"
+                        onClick={() => {
+                          setSelectedCategory(categories.find(c => c.id === expandedCategoryId)?.name || '');
+                          setSelectedSubcategory(subcat);
+                          setExpandedCategoryId(null);
+                          setView('listing');
+                        }}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <div className="subcategory-icon">
+                          <Gem size={32} color="#C5A059" />
+                        </div>
+                        <span className="subcategory-name">{subcat}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </section>
 
             {/* Shop By Gender */}
@@ -1007,6 +1093,14 @@ const App: React.FC = () => {
               setUsers={setUsers}
               orders={orders}
               setOrders={setOrders}
+              categories={categories}
+              setCategories={setCategories}
+              coupons={coupons}
+              setCoupons={setCoupons}
+              paymentMethods={paymentMethods}
+              setPaymentMethods={setPaymentMethods}
+              deliveryOptions={deliveryOptions}
+              setDeliveryOptions={setDeliveryOptions}
               adminEmail={adminEmail}
               onLogout={handleAdminLogout}
             />
