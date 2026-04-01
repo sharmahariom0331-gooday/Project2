@@ -519,7 +519,7 @@ const App: React.FC = () => {
                     <span className="exclusive-text">Exclusive</span>
                     <h3 className="glow-text">WOMEN'S JEWELLERY</h3>
                   </div>
-                  <img src="./src/emerald_neck.png" alt="Women" />
+                  <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1000" alt="Women" />
                 </motion.div>
                 <div className="gender-column">
                   <motion.div className="gender-tile" whileHover={{ scale: 1.02 }} onClick={() => handleCategoryClick("Men's Jewellery")} style={{ cursor: 'pointer' }}>
@@ -550,7 +550,7 @@ const App: React.FC = () => {
               </div>
               <div className="trending-layout">
                 <div className="trending-large" style={{ cursor: 'pointer' }}>
-                  <img src="./emerald_neck.png" alt="Necklace" />
+                  <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1000" alt="Necklace" />
                   <div className="trending-info-overlay">
                     <h3 className="trending-main-title">Statement Necklaces</h3>
                     <p className="trending-main-price">Starting from ₹ 32,400*</p>
@@ -637,7 +637,7 @@ const App: React.FC = () => {
                   </div>
                 </div>
                 <div className="trending-large">
-                  <img src="./choker.png" alt="Choker" />
+                  <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1000" alt="Choker" />
                   <div className="trending-info-overlay">
                     <h3 className="trending-main-title">Traditional Chokers</h3>
                     <p className="trending-main-price">₹ 85,000</p>
@@ -709,7 +709,7 @@ const App: React.FC = () => {
             <section className="section-container about-us-section">
               <div className="about-us-wrapper">
                 <div className="about-us-image">
-                  <img src="./founder.png" alt="Akshima Founder" />
+                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400" alt="Akshima Founder" />
                 </div>
                 <div className="about-us-content">
                   <div className="about-us-header">
