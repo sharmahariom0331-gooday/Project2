@@ -434,33 +434,6 @@ const App: React.FC = () => {
 
   return (
     <div className="akshima-app">
-      {/* Header */}
-      <header className="header">
-        <div className="header-container">
-          <div className="logo-section">
-            <a href="#" onClick={(e) => { e.preventDefault(); handleBackToHome(); }} className="logo-link">
-              <img src="https://cdn.builder.io/api/v1/image/assets%2Fb9cea9b922974557858568df8bd7471e%2Ff83968c3dd8d4681b4cfe8be13d70d0e?format=webp&width=800&height=1200" alt={settings.siteName} className="logo-img" />
-            </a>
-          </div>
-          <div className="search-bar">
-            <Search size={16} />
-            <input type="text" placeholder="Search for gold necklace, diamond jewellery, etc." />
-            <Camera size={16} />
-            <Mic size={16} />
-          </div>
-          <div className="header-icons">
-            <button className="icon-btn" title="Offers"><Gem size={20} /></button>
-            <button className="icon-btn" onClick={handleBackToHome} title="Home"><Home size={20} /></button>
-            <button className="icon-btn" title="Wishlist"><Heart size={20} /></button>
-            <button className="icon-btn" title="Account"><User size={20} /></button>
-            <div className="cart-icon">
-              <button className="icon-btn"><ShoppingBag size={20} /></button>
-              <span className="cart-count">0</span>
-            </div>
-          </div>
-        </div>
-      </header>
-
       <AnimatePresence mode="wait">
         {view === 'home' && (
           <motion.div
